@@ -6,8 +6,31 @@ export async function POST(request: any) {
 	try {
 		const { username, email, password } = await request.json();
 
+		// Check if the email or username already exists
+		const existingUser = await prisma.user.findFirst({
+			where: {
+				OR: [{ email }, { username }],
+			},
+		});
+
+		if (existingUser) {
+			// If user with the same email or username exists, return an error
+			return NextResponse.json(
+				{
+					success: false,
+					message:
+						"Username or email already exists. Please choose a different one.",
+				},
+				{
+					status: 400, // Bad Request
+				}
+			);
+		}
+
+		// Hash the password
 		const hashedPassword = await bcrypt.hash(password, 10);
 
+		// Create the new user
 		const newUser = await prisma.user.create({
 			data: {
 				username,
@@ -22,7 +45,7 @@ export async function POST(request: any) {
 		return NextResponse.json(
 			{
 				success: true,
-				message: "User Registeration Successful",
+				message: "User registration successful",
 			},
 			{
 				status: 200,
@@ -33,7 +56,7 @@ export async function POST(request: any) {
 		return NextResponse.json(
 			{
 				success: false,
-				message: `Failed to create User: ${error.message}`,
+				message: `Failed to create user: ${error.message}`,
 			},
 			{
 				status: 500,

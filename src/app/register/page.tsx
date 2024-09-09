@@ -1,9 +1,13 @@
-'use client'
+"use client";
 import Link from "next/link";
 import "./register.scss";
 import { useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 function Register() {
+	const router = useRouter();
+	const [message, setMessage] = useState("");
 	const [formData, setFormData] = useState({
 		username: "",
 		email: "",
@@ -18,10 +22,20 @@ function Register() {
 		}));
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		// Handle form submission logic here
-		console.log(formData);
+		try {
+			const res = await axios.post("api/auth/register", formData);
+			setMessage(res.data.message); // Display the success message
+
+			if (res.data.success) {
+				// Navigate to the login page after successful registration
+				router.push("/login");
+			}
+		} catch (error: any) {
+			setMessage(error.response?.data.message || "Registration failed.");
+			console.log(message)
+		}
 	};
 
 	return (
