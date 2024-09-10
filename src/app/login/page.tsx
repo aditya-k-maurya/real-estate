@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import Link from "next/link";
 import { useState } from "react";
 import "./login.scss";
@@ -6,9 +6,9 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 
 function Login() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+	const router = useRouter();
+	const [loading, setLoading] = useState(false);
+	const [message, setMessage] = useState("");
 	const [formData, setFormData] = useState({
 		username: "",
 		password: "",
@@ -27,12 +27,12 @@ function Login() {
 		setLoading(true);
 
 		try {
-			const res = await axios.post("/api/login", formData);
-			setMessage(res.data.message); // Success message
+			const res = await axios.post("/api/auth/login", formData);
+			setMessage(res.data);
 
-			if (res.data.success) {
-				router.push("/login");
-			}
+			localStorage.setItem("user", JSON.stringify(res.data));
+      router.push("/");
+      
 		} catch (error: any) {
 			if (axios.isAxiosError(error)) {
 				// Check if it's an Axios error
@@ -57,7 +57,6 @@ function Login() {
 		}
 	};
 
-
 	return (
 		<div className="login">
 			<div className="formContainer">
@@ -77,7 +76,9 @@ function Login() {
 						value={formData.password}
 						onChange={handleChange}
 					/>
-					<button type="submit" disabled = {loading}>Login</button>
+					<button type="submit" disabled={loading}>
+						Login
+					</button>
 					<Link href="/register">{"Don't"} you have an account?</Link>
 				</form>
 			</div>

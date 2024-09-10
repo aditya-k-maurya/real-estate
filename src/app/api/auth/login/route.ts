@@ -28,6 +28,8 @@ export async function POST(request: any) {
 			);
 		}
 
+		const { password:userPassword, ...userInfo } = user;
+
 		const token = jwt.sign(
 			{
 				id: user.id,
@@ -50,6 +52,7 @@ export async function POST(request: any) {
 			{
 				success: true,
 				message: "User Login Successful",
+				data:userInfo
 			},
 			{
 				status: 200,
